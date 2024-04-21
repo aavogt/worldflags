@@ -1,0 +1,26 @@
+name: worldflags
+synopsis: Practice typing country names given their flags.
+license-file: LICENSE
+dependencies:
+  - base
+  - gloss
+  - combinat
+  - cmdargs
+  - lens
+  - generic-lens
+  - zippers
+  - binary
+  - filepath
+  - directory
+  - random
+  - gloss-juicy
+  - monadic-bang
+  - time
+  - containers
+
+tested-with: GHC == 9.8.2
+
+executable:
+  main:
+    main.hs
+  source-dirs: .

@@ -1,0 +1,39 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           worldflags
+version:        0.0.0
+synopsis:       Practice typing country names given their flags.
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+tested-with:
+    GHC == 9.8.2
+
+executable worldflags
+  main-is: main.hs
+  other-modules:
+      Bmp
+      Paths_worldflags
+  hs-source-dirs:
+      ./
+  build-depends:
+      base
+    , binary
+    , cmdargs
+    , combinat
+    , containers
+    , directory
+    , filepath
+    , generic-lens
+    , gloss
+    , gloss-juicy
+    , lens
+    , monadic-bang
+    , random
+    , time
+    , zippers
+  default-language: Haskell2010
