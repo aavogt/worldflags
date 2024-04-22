@@ -6,6 +6,16 @@ When you run `worldflags`, you get the window below. The white background moves 
 
 ![World Flags](ui.png)
 
+## Installation
+
+Get ghc and cabal with [ghcup](https://www.haskell.org/ghcup/install/)
+
+        apt install libsdl2-dev
+        git clone https://github.com/aavogt/worldflags.git
+        cd worldflags
+        cabal install
+        worldflags
+
 ## TODO
 
 - [ ] pagination
