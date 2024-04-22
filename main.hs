@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators, TemplateHaskell #-}
 {-# OPTIONS_GHC -fplugin MonadicBang #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 import Bmp (sporcle)
 import Control.Lens
@@ -18,6 +19,8 @@ import System.Directory
 import System.IO
 import System.Random
 import Text.Printf
+
+import Paths_worldflags
 
 
 data Card = Card { _front :: String, _img :: Maybe Picture, _backs :: [String] }
@@ -88,7 +91,10 @@ permuteIO xs = do
 
 main = do
   sporcle <- permuteIO sporcle
-  fs <- mapM (loadJuicyPNG . printf "bmp/%s.png" . map toLower) $ sporcle ^.. traversed . _1
+  fs :: [Maybe Picture] <- do
+    let twoLetter = sporcle ^.. traversed . _1
+    ps <- mapM (getDataFileName . printf "bmp/%s.png" . map toLower) twoLetter
+    mapM loadJuicyPNG ps
   let clean = map toLower . filter (not . isSpace)
   let c0 = [ Card a (scale 0.2 0.2 <$> f) (map clean b) | ((a, _emoji, b), f) <- sporcle `zip` fs ]
   let s0 = S { _cards = zipper c0 & fromWithin traversed,

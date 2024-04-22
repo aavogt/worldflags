@@ -20,6 +20,8 @@ dependencies:
 
 tested-with: GHC == 9.8.2
 
+data-files: bmp/*.png
+
 executable:
   main:
     main.hs
