@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -fplugin MonadicBang #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns #-}
 
 import Bmp (sporcle)
 import Control.Lens
@@ -21,12 +22,15 @@ import System.Random
 import Text.Printf
 
 import Paths_worldflags
+import Data.Time
+import Data.Time.Clock.POSIX
 
 
 data Card = Card { _front :: String, _img :: Maybe Picture, _backs :: [String] }
 
 data S = S { _log :: FilePath, _cards :: Top :>> [Card] :>> Card,
         _input, _inputErr :: [Char],
+        _inputTime, _inputErrTime :: [POSIXTime],
         _clean :: String -> String,
         _finished :: Bool }
 foldMap makeLenses [ ''S,  ''Card ]
@@ -49,7 +53,13 @@ draw s = return $ Translate (-w*fromIntegral ncol/2) (-h*nrow/2) $ Pictures $ zi
  ncol = 16
 
 evt :: Event -> S -> IO S
-evt (EventKey (Char k) Up _ _) = advanceCard . (input %~ (k:)) . (inputErr %~ (k:))
+evt (EventKey (Char k) Up _ _) = \s0 -> do
+        t <- getPOSIXTime
+        s0 & inputErr %~ (k:)
+           & input %~ (k:)
+           & inputTime %~ (t:)
+           & inputErrTime %~ (t:)
+           & advanceCard
  where
  advanceCard :: S -> IO S
  advanceCard s
@@ -69,16 +79,38 @@ logGame :: S -> IO ()
 logGame s = do
   e <- doesFileExist (s^.log)
   h <- openFile (s^.log) AppendMode
-  when (not e) $ hPutStrLn h "front,back,input,err,finished"
+  when (not e) $ do
+    hPutStrLn h "# 2 letter country code, one of the allowable country names, every input character, input charaters discarded, did the game end, time in unix seconds for the first character, seconds relative to time0 for input, seconds relative to time0 for error"
+    hPutStrLn h "front,back,input,err,ok,finished,time0,inputTime,errTime,inputOkTime"
 
   let (fs,bs) = s^.cards & rezip & map (\ (Card f _ b) -> (f,head b)) & unzip
+
+  let takePrec (break (=='.') -> (a,b)) = takeWhile (/='s') $ a ++ take 5 b
+      fmtTS = intercalate "|" . reverse . map (takePrec . show . (subtract t0))
+      t0 = s ^?! inputTime . _last
+
+      (inputOkT, inputOk) = unzip
+                $ zip (s^.inputTime) (s^.input)
+                        `sub` zip (s^.inputErrTime) (s^.inputErr)
+        where
+        -- more robust but slower equivalent:
+        -- sub xs ys = Set.toDescList (Set.fromList xs Set.\\ Set.fromList ys)
+        sub x [] = x
+        sub (x@(t1,c1):xs) (y@(t2,c2):ys)
+                | x == y = sub xs ys
+                | otherwise = x : sub xs ys
 
   hPutStrLn h $ intercalate "," $
         [intercalate "|" fs,
          intercalate "|" bs,
-         s^.input,
-         s^.inputErr,
-         show (s^.finished)]
+         s^.input & reverse,
+         s^.inputErr & reverse,
+         reverse inputOk,
+         show (s^.finished),
+         init (show t0),
+         fmtTS (s^.inputTime),
+         fmtTS (s^.inputErrTime),
+         fmtTS inputOkT]
          & traversed.traversed %~ \case
                 '\n' -> ' '
                 ',' -> '_'
@@ -101,6 +133,7 @@ main = do
                 _clean = clean,
                 _input = "",
                 _inputErr = "",
+                _inputErrTime = [], _inputTime = [],
                 _finished = False,
                 _log = "log.csv" }
   interactIO FullScreen black s0 draw evt (const (return ()))

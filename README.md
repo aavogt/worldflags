@@ -1,4 +1,4 @@
-# world flags
+# Worldflags
 
 This is a desktop version of [sporcle worldflags](https://www.sporcle.com/games/g/worldflags) done with haskell gloss. Check Bmp.hs for allowable spellings.
 
@@ -23,6 +23,5 @@ Get ghc and cabal with [ghcup](https://www.haskell.org/ghcup/install/)
 - [ ] some flags like Nepal or Switzerland are a little too big
 - [ ] display typed text
 - [ ] disambiguate Romania and Chad
-- [ ] log the total time, times for each country, ms between each character
 - [ ] allow skipping forward / giving the solution after a certain number of mistakes
 - [ ] non-random order: two flags right after eachother may lead to more mistakes than if they were separated. Two flags right after eachother may take longer than if they were separated. Mistakes and duration are connected.
