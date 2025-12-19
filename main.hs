@@ -97,7 +97,7 @@ logGame s = do
   h <- openFile (s^.log) AppendMode
   when (not e) $ do
     hPutStrLn h "# 2 letter country code, one of the allowable country names, every input character, input charaters discarded, did the game end, time in unix seconds for the first character, seconds relative to time0 for input, seconds relative to time0 for error"
-    hPutStrLn h "front,back,input,err,ok,finished,time0,inputTime,errTime,inputOkTime"
+    hPutStrLn h "front,back,input,err,ok,finished,time0,inputTime,errTime,okTime"
 
   let (fs,bs) = s^.cards & rezip & map (\ (Card f _ b) -> (f,head b)) & unzip
 
