@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.1.
+-- This file has been generated from package.yaml by hpack version 0.38.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -283,12 +283,12 @@ executable worldflags
     , containers
     , directory
     , filepath
-    , generic-lens
     , gloss
     , gloss-juicy
     , lens
     , monadic-bang
     , random
+    , split
     , time
     , zippers
   default-language: Haskell2010

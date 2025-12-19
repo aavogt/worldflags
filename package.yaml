@@ -7,7 +7,6 @@ dependencies:
   - combinat
   - cmdargs
   - lens
-  - generic-lens
   - zippers
   - binary
   - filepath
