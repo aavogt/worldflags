@@ -63,7 +63,7 @@ insertCM s = s & input %~ ('\t':)
                 [] -> (:[]) <$> getPOSIXTime)
 
 evt :: Event -> S -> IO S
-evt (EventKey (Char k) Up _ _) = \s0 -> do
+evt (EventKey (Char k) Down _ _) = \s0 -> do
         t <- getPOSIXTime
         s0 & inputErr %~ (k:)
            & input %~ (k:)
