@@ -143,7 +143,7 @@ main = do
     ps <- mapM (getDataFileName . printf "bmp/%s.png" . map toLower) twoLetter
     mapM loadJuicyPNG ps
   let clean = map toLower . filter (not . isSpace)
-  let c0 = [ Card a (scale 0.2 0.2 <$> f) (map clean b) | ((a, _emoji, b), f) <- sporcle `zip` fs ]
+  let c0 = [ Card a (scale 0.30 0.30 <$> f) (map clean b) | ((a, _emoji, b), f) <- sporcle `zip` fs ]
   let s0 = S { _cards = zipper c0 & fromWithin traversed,
                 _clean = clean,
                 _input = "",
