@@ -20,6 +20,7 @@ import System.Directory
 import System.IO
 import System.Random
 import Text.Printf
+import Data.List.Split
 
 import Paths_worldflags
 import Data.Time
@@ -37,11 +38,14 @@ foldMap makeLenses [ ''S,  ''Card ]
 
 
 draw :: S -> IO Picture
-draw s = return $ Translate (-w*fromIntegral ncol/2) (-h*nrow/2) $ Pictures $ zipWith f (s^.cards&rezip) [0 .. ]
+draw s = return $ Translate (-w*fromIntegral ncol/2) (h -h*nrow/2) $ Pictures $ (++[currentText]) $ zipWith f (s^.cards&rezip) [0 .. ]
  where
+ currentText = Translate 0 (-2.5*h) $ Color white $ Text $ unwords $ addCursor $ map reverse $ take 3 $ splitOn "\t" $ _input s
+ addCursor ([]: xs) = "_" : xs
+ addCursor xs = xs
  nrow = lengthOf (cards . to rezip . folded) s `div` ncol & fromIntegral
- h = 50
- w = 80
+ h = 65
+ w = 110
  f (Card f p _) i = Translate (w * y) (h * x) $ box <> fromMaybe (text f) p
         where
         (x,y) = divMod i ncol & each %~ fromIntegral
@@ -50,7 +54,13 @@ draw s = return $ Translate (-w*fromIntegral ncol/2) (-h*nrow/2) $ Pictures $ zi
             | otherwise = Color (withAlpha 0.4 white) $ rectangleSolid w h
          
  iCur = s^.cards & tooth
- ncol = 16
+ ncol = 15
+
+insertCM :: S -> IO S
+insertCM s = s & input %~ ('\t':)
+        & inputTime %%~ (\case
+                x:xs -> return (x:x:xs)
+                [] -> (:[]) <$> getPOSIXTime)
 
 evt :: Event -> S -> IO S
 evt (EventKey (Char k) Up _ _) = \s0 -> do
@@ -66,10 +76,15 @@ evt (EventKey (Char k) Up _ _) = \s0 -> do
         | let inp = (s^.clean) (s^.inputErr),
           stripped : _ <- s^..cards.focus.backs.traversed.reversed.to (`stripPrefix` inp)._Just
                 = s & inputErr .~ stripped
-                    & cards %%~ rightward
-                    & maybe (do -- can't go farther right
-                                unless (s^.finished) (logGame s)
-                                s & finished .~ True & return)
+                    & insertCM
+                    <&> cards %%~ rightward
+                    >>= maybe (do -- can't go farther right
+                                -- the last flag needs a trailing \t
+                                s' <- insertCM s <&> finished .~ True
+                                unless (s^.finished) $ do
+                                        logGame s'
+                                        putStrLn "logged"
+                                return s')
                         return
          | otherwise = return s
 evt _ = return

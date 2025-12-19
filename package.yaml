@@ -17,6 +17,7 @@ dependencies:
   - monadic-bang
   - time
   - containers
+  - split
 
 tested-with: GHC == 9.8.2
 
