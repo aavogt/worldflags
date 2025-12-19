@@ -21,7 +21,6 @@ Get ghc and cabal with [ghcup](https://www.haskell.org/ghcup/install/)
 - [ ] pagination
 - [ ] ncol is currently hardcoded but it could be based on the ViewPort
 - [ ] some flags like Nepal or Switzerland are a little too big
-- [ ] display typed text
 - [ ] disambiguate Romania and Chad
 - [ ] allow skipping forward / giving the solution after a certain number of mistakes
 - [ ] non-random order: two flags right after eachother may lead to more mistakes than if they were separated. Two flags right after eachother may take longer than if they were separated. Mistakes and duration are connected.
