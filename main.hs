@@ -25,6 +25,7 @@ import Data.List.Split
 import Paths_worldflags
 import Data.Time
 import Data.Time.Clock.POSIX
+import qualified Data.Set as Set
 
 
 data Card = Card { _front :: String, _img :: Maybe Picture, _backs :: [String] }
@@ -108,12 +109,7 @@ logGame s = do
                 $ zip (s^.inputTime) (s^.input)
                         `sub` zip (s^.inputErrTime) (s^.inputErr)
         where
-        -- more robust but slower equivalent:
-        -- sub xs ys = Set.toDescList (Set.fromList xs Set.\\ Set.fromList ys)
-        sub x [] = x
-        sub (x@(t1,c1):xs) (y@(t2,c2):ys)
-                | x == y = sub xs ys
-                | otherwise = x : sub xs ys
+        sub xs ys = Set.toDescList (Set.fromList xs Set.\\ Set.fromList ys)
 
   hPutStrLn h $ intercalate "," $
         [intercalate "|" fs,
